@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "desafio-bp"
+version = "0.1.0"
+description = "Desafio BP"
+authors = ["Diogo Lima"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.115.2"
+uvicorn = "^0.32.0"
+granian = "^1.6.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
