@@ -14,8 +14,14 @@ class Game:
         return f"{self.board.players} - {self.turn}"
 
     def next_turn(self):
-        self.current_player = self.board.players[self.turn % len(self.board.players)]
+        player_index = self.turn % len(self.board.players)
+        self.current_player = self.board.players[player_index]
         self.turn += 1
+
+    @property
+    def is_game_over(self) -> bool:
+        positive_balance = filter(lambda p: p.balance > 0, self.board.players)
+        return len(list(positive_balance)) == 1 or self.turn > 1000
 
 
 def start_game() -> Game:
@@ -37,7 +43,7 @@ def start_game() -> Game:
 
     game = Game(Board(players=players, properties=properties))
 
-    while game.turn <= 1000:
+    while not game.is_game_over:
         game.next_turn()
 
     return game
