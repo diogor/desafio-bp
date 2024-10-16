@@ -1,5 +1,5 @@
 import random
-from core.entities import Board, Player, PlayerType, Property
+from entities import Board, Player, PlayerType, Property
 
 
 class Game:
