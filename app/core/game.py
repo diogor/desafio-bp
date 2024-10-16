@@ -17,7 +17,7 @@ class Game:
         player_index = self.turn % len(self.board.players)
         self.current_player = self.board.players[player_index]
 
-        self._check_players_progress()
+        self._check_player_progress()
 
         if self.current_player.balance >= 0:
             self._move(self._roll())
@@ -83,15 +83,16 @@ class Game:
         self.current_player.balance -= property.rent
         property.owner.balance += property.rent
 
-    def _check_players_progress(self) -> None:
-        for player in self.board.players:
-            if player.balance < 0:
-                owned_properties = filter(
-                    lambda p: p.owner == player, self.board.properties
-                )
+    def _check_player_progress(self) -> None:
+        player = self.current_player
 
-                for property in owned_properties:
-                    property.owner = None
+        if player.balance < 0:
+            owned_properties = filter(
+                lambda p: p.owner == player, self.board.properties
+            )
+
+            for property in owned_properties:
+                property.owner = None
 
 
 def start_game() -> Game:
