@@ -17,8 +17,11 @@ class Game:
         player_index = self.turn % len(self.board.players)
         self.current_player = self.board.players[player_index]
 
-        self._move(self._roll())
-        self._operate()
+        self._check_players_progress()
+
+        if self.current_player.balance >= 0:
+            self._move(self._roll())
+            self._operate()
 
         self.turn += 1
 
@@ -28,7 +31,14 @@ class Game:
         return len(list(positive_balance)) == 1 or self.turn > 1000
 
     def _roll(self) -> int:
-        return random.randint(1, 6)
+        number = random.randint(1, 6)
+        self.current_player.steps += number
+
+        if self.current_player.steps > len(self.board.properties):
+            self.current_player.steps = 0
+            self.current_player.balance += 100
+
+        return number
 
     def _move(self, spaces: int) -> None:
         next_pos = self.current_player.position + spaces
@@ -38,20 +48,24 @@ class Game:
         player_type = self.current_player.type
         property = self.board.properties[self.current_player.position]
 
-        match player_type:
-            case PlayerType.Impulsive:
-                self._negotiate_property()
-            case PlayerType.Demanding:
-                if property.rent > 50:
-                    self._negotiate_property()
-            case PlayerType.Cautious:
-                if self.current_player.balance - property.price >= 80:
-                    self._negotiate_property()
-            case PlayerType.Random:
-                if random.choice([True, False]):
-                    self._negotiate_property()
+        if property.owner is None:
+            match player_type:
+                case PlayerType.Impulsive:
+                    self._buy_property()
+                case PlayerType.Demanding:
+                    if property.rent > 50:
+                        self._buy_property()
+                case PlayerType.Cautious:
+                    if self.current_player.balance - property.price >= 80:
+                        self._buy_property()
+                case PlayerType.Random:
+                    if random.choice([True, False]):
+                        self._buy_property()
 
-    def _negotiate_property(self) -> None:
+        if property.owner:
+            self._rent_property()
+
+    def _buy_property(self) -> None:
         property = self.board.properties[self.current_player.position]
 
         if self.current_player.balance < property.price:
@@ -59,6 +73,25 @@ class Game:
 
         self.current_player.balance -= property.price
         property.owner = self.current_player
+
+    def _rent_property(self) -> None:
+        property = self.board.properties[self.current_player.position]
+
+        if not property.owner or property.owner == self.current_player:
+            return
+
+        self.current_player.balance -= property.rent
+        property.owner.balance += property.rent
+
+    def _check_players_progress(self) -> None:
+        for player in self.board.players:
+            if player.balance < 0:
+                owned_properties = filter(
+                    lambda p: p.owner == player, self.board.properties
+                )
+
+                for property in owned_properties:
+                    property.owner = None
 
 
 def start_game() -> Game:
@@ -75,7 +108,7 @@ def start_game() -> Game:
 
     for _ in range(20):
         price = random.randint(10, 600)
-        rent = price * 0.01
+        rent = random.uniform(price * 0.01, price * 0.9)
         properties.append(Property(price, rent, None))
 
     game = Game(Board(players=players, properties=properties))

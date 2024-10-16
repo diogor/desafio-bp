@@ -14,6 +14,7 @@ class Player:
     balance: float
     position: int
     type: PlayerType
+    steps: int = 0
 
 
 @dataclass
