@@ -114,6 +114,9 @@ def start_game() -> Game:
 
     random.shuffle(players)
 
+    for i, player in enumerate(players):
+        player.play_order = i
+
     properties = []
 
     for _ in range(20):

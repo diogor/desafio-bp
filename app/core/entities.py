@@ -15,6 +15,7 @@ class Player:
     position: int
     type: PlayerType
     steps: int = 0
+    play_order: int = 0
 
 
 @dataclass
