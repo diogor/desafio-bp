@@ -20,8 +20,8 @@ class Game:
         self._check_player_progress()
 
         if self.current_player.balance >= 0:
-            self._move(self._roll())
-            self._operate()
+            self._move()
+            self._buy_or_rent_property()
 
         self.turn += 1
 
@@ -40,11 +40,12 @@ class Game:
 
         return number
 
-    def _move(self, spaces: int) -> None:
+    def _move(self) -> None:
+        spaces = self._roll()
         next_pos = self.current_player.position + spaces
         self.current_player.position = next_pos % len(self.board.properties)
 
-    def _operate(self) -> None:
+    def _buy_or_rent_property(self) -> None:
         player_type = self.current_player.type
         property = self.board.properties[self.current_player.position]
 
