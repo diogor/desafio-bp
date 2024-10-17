@@ -3,10 +3,10 @@ from enum import Enum
 
 
 class PlayerType(Enum):
-    Impulsive = 1
-    Demanding = 2
-    Cautious = 3
-    Random = 4
+    Impulsive = "impulsivo"
+    Demanding = "exigente"
+    Cautious = "cauteloso"
+    Random = "aleatório"
 
 
 @dataclass
