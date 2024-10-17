@@ -116,6 +116,7 @@ def start_game() -> Game:
 
     for i, player in enumerate(players):
         player.play_order = i
+        player.position = -1
 
     properties = []
 
