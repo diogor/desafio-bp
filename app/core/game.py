@@ -1,5 +1,13 @@
 import random
-from entities import Board, Player, PlayerType, Property
+from app.config.settings import (
+    PROPERTY_MAX_PRICE,
+    PROPERTY_MIN_PRICE,
+    RENT_MAX_PERCENTAGE,
+    RENT_MIN_PERCENTAGE,
+    TABLE_ROUND_BONUS,
+    TURN_LIMIT,
+)
+from .entities import Board, Player, PlayerType, Property
 
 
 class Game:
@@ -28,7 +36,7 @@ class Game:
     @property
     def is_game_over(self) -> bool:
         positive_balance = filter(lambda p: p.balance > 0, self.board.players)
-        return len(list(positive_balance)) == 1 or self.turn > 1000
+        return len(list(positive_balance)) == 1 or self.turn > TURN_LIMIT
 
     def _roll(self) -> int:
         number = random.randint(1, 6)
@@ -36,7 +44,7 @@ class Game:
 
         if self.current_player.steps > len(self.board.properties):
             self.current_player.steps = 0
-            self.current_player.balance += 100
+            self.current_player.balance += TABLE_ROUND_BONUS
 
         return number
 
@@ -109,8 +117,13 @@ def start_game() -> Game:
     properties = []
 
     for _ in range(20):
-        price = random.randint(10, 600)
-        rent = random.uniform(price * 0.01, price * 0.9)
+        price = random.randint(PROPERTY_MIN_PRICE, PROPERTY_MAX_PRICE)
+        rent = round(
+            random.uniform(
+                price * (RENT_MIN_PERCENTAGE / 100), price * (RENT_MAX_PERCENTAGE / 100)
+            ),
+            2,
+        )
         properties.append(Property(price, rent, None))
 
     game = Game(Board(players=players, properties=properties))
